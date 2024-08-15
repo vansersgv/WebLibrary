@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebLibrary.Context;
+using Swashbuckle.AspNetCore.Annotations;
 using WebLibrary.DTOs;
-using WebLibrary.Entities;
-
+using WebLibrary.Services;
 
 namespace WebLibrary.Controllers
 {
@@ -12,91 +10,67 @@ namespace WebLibrary.Controllers
     [ApiController]
     public class LibroController : ControllerBase
     {
-        private readonly AppDbContext _context; 
-        public LibroController(AppDbContext context)
+        private readonly LibroService _libroService;
+
+        public LibroController(LibroService libroService)
         {
-            _context=context;
+            _libroService = libroService;
         }
-        
+
         [HttpGet]
         [Route("lista")]
+        [SwaggerOperation(Summary = "Obtiene la lista de todos los libros")]
         public async Task<ActionResult<List<LibroDTO>>> Get()
         {
-            var listaDTO = new List<LibroDTO>();
-            var listaDB = await _context.Libros.Include(a => a.AutorReferencia). ToListAsync();
-            foreach (var item in listaDB)
-            {
-                listaDTO.Add(new LibroDTO
-                {
-                    IdLibro = item.IdLibro,
-                    Titulo = item.Titulo,
-                    Descripcion = item.Descripcion,
-                    FechaDePublicacion = item.FechaDePublicacion,
-                    AutorId = item.AutorId
-                });
-            }
+            var listaDTO = await _libroService.GetLibrosAsync();
             return Ok(listaDTO);
         }
 
         [HttpGet]
-        [Route("buscar/{id}")]
-        public async Task<ActionResult<LibroDTO>> Get(int id)
-        { 
-            var libroDTO = new LibroDTO();
-            var libroDB = await _context.Libros.Include(a => a.AutorReferencia)
-                .Where(x => x.IdLibro == id).FirstAsync();
-
-            libroDTO.IdLibro = id;
-            libroDTO.Titulo = libroDB.Titulo;
-            libroDTO.Descripcion = libroDB.Descripcion;
-            libroDTO.FechaDePublicacion = libroDB.FechaDePublicacion;
-            libroDTO.AutorId = libroDB.AutorId;
-            return Ok(libroDTO);
-        }                  
-
-
-
-            [HttpPost]
-        [Route("crear")]
-        public async Task<ActionResult> crear(LibroDTO libroDTO)
+        [Route("buscar/{nombre}")]
+        [SwaggerOperation(Summary = "Busca un libro por su nombre")]
+        public async Task<ActionResult<LibroDTO>> Get(string nombre)
         {
-            var libroDB = new Libro
+            var libroDTO = await _libroService.GetLibroByNombreAsync(nombre);
+            if (libroDTO == null)
             {
-                Titulo = libroDTO.Titulo,
-                Descripcion = libroDTO.Descripcion,
-                FechaDePublicacion = libroDTO.FechaDePublicacion,
-                AutorId = libroDTO.AutorId
-            };
-            _context.Libros.Add(libroDB);
-            await _context.SaveChangesAsync();
+                return NotFound("Libro no encontrado");
+            }
+            return Ok(libroDTO);
+        }
+
+        [HttpPost]
+        [Route("crear")]
+        [SwaggerOperation(Summary = "Crea un nuevo libro")]
+        public async Task<ActionResult> Crear(LibroDTO libroDTO)
+        {
+            await _libroService.CrearLibroAsync(libroDTO);
             return Ok("Libro agregado");
         }
 
         [HttpPut]
         [Route("editar")]
+        [SwaggerOperation(Summary = "Edita un libro existente")]
         public async Task<ActionResult> Editar(LibroDTO libroDTO)
         {
-            var libroDB = await _context.Libros.Include(a => a.AutorReferencia)
-                .Where(x => x.IdLibro == libroDTO.IdLibro).FirstAsync();
-            libroDB.Titulo = libroDTO.Titulo;
-            libroDB.Descripcion = libroDTO.Descripcion;
-            libroDB.FechaDePublicacion = libroDTO.FechaDePublicacion;
-            libroDB.AutorId = libroDTO.AutorId;
-            _context.Libros.Update(libroDB);
-            await _context.SaveChangesAsync();
-            return Ok("Libro editado");
-        }
-        [HttpDelete]
-        [Route("eliminar/{id}")]
-        public async Task<ActionResult> Eliminar(int id)
-        {
-            var libroDB = await _context.Libros.FindAsync(id);
-            if (libroDB == null)
+            var result = await _libroService.EditarLibroAsync(libroDTO);
+            if (!result)
             {
                 return NotFound("Libro no encontrado");
             }
-            _context.Libros.Remove(libroDB);
-            await _context.SaveChangesAsync();
+            return Ok("Libro editado");
+        }
+
+        [HttpDelete]
+        [Route("eliminar/{id}")]
+        [SwaggerOperation(Summary = "Elimina un libro por su ID")]
+        public async Task<ActionResult> Eliminar(int id)
+        {
+            var result = await _libroService.EliminarLibroAsync(id);
+            if (!result)
+            {
+                return NotFound("Libro no encontrado");
+            }
             return Ok("Libro eliminado");
         }
     }

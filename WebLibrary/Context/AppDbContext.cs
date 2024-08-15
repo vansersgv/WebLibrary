@@ -28,7 +28,7 @@ namespace WebLibrary.Context
                 tb.Property(col => col.Descripcion).IsRequired();
                 tb.Property(col => col.FechaDePublicacion).IsRequired();
                 tb.Property(col => col.AutorId).IsRequired();
-                tb.HasOne(col => col.AutorReferencia).WithMany(a => a.LibrosReferencia)
+                tb.HasOne(col => col.Autor).WithMany(a => a.Libros)
                 .HasForeignKey(col => col.AutorId);
 
             });
