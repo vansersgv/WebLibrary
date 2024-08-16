@@ -42,8 +42,13 @@ namespace WebLibrary.Controllers
         [HttpPost]
         [Route("crear")]
         [SwaggerOperation(Summary = "Crea un nuevo libro")]
-        public async Task<ActionResult> Crear(LibroDTO libroDTO)
+        public async Task<ActionResult> Crear([FromBody] LibroDTO libroDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             await _libroService.CrearLibroAsync(libroDTO);
             return Ok("Libro agregado");
         }
@@ -51,8 +56,13 @@ namespace WebLibrary.Controllers
         [HttpPut]
         [Route("editar")]
         [SwaggerOperation(Summary = "Edita un libro existente")]
-        public async Task<ActionResult> Editar(LibroDTO libroDTO)
+        public async Task<ActionResult> Editar([FromBody] LibroDTO libroDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _libroService.EditarLibroAsync(libroDTO);
             if (!result)
             {

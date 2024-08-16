@@ -41,8 +41,13 @@ namespace WebLibrary.Controllers
         [HttpPost]
         [Route("crear")]
         [SwaggerOperation(Summary = "Crea un nuevo autor")]
-        public async Task<ActionResult> Crear(AutorDTO autorDTO)
+        public async Task<ActionResult> Crear([FromBody] AutorDTO autorDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             await _autorService.CrearAutorAsync(autorDTO);
             return Ok("Autor agregado");
         }
@@ -50,8 +55,13 @@ namespace WebLibrary.Controllers
         [HttpPut]
         [Route("editar")]
         [SwaggerOperation(Summary = "Edita un autor existente")]
-        public async Task<ActionResult> Editar(AutorDTO autorDTO)
+        public async Task<ActionResult> Editar([FromBody] AutorDTO autorDTO)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var result = await _autorService.EditarAutorAsync(autorDTO);
             if (!result)
             {
