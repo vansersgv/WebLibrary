@@ -20,7 +20,22 @@
         .list-group-item {
             cursor: pointer;
         }
+        
+        .list-group-item {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            background-color: #f8f9fa;
+            margin-bottom: 5px;
+        }
+
+        .list-group-item:hover,
+        .list-group-item:focus {
+            background-color: #007bff; /* Color azul */
+            color: white; /* Texto blanco para mejor contraste */
+        }
     </style>
+    
 </head>
 <body>
 
@@ -47,7 +62,7 @@
                 <ul class="list-group" id="libro-lista">
                     <li class="list-group-item" onclick="verLibros()">Ver todos los libros</li>
                     <li class="list-group-item" onclick="buscarLibro()">Buscar un libro por nombre</li>
-                    <li class="list-group-item" onclick="vista()">Solo de vista</li>
+                    <li class="list-group-item" onclick="vista()">Proximamente Audiolibros</li>
                 </ul>
             </div>
         </div>
