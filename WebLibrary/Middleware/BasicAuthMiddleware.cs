@@ -25,11 +25,10 @@ public class BasicAuthMiddleware
                 var credentials = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader.Substring(BasicScheme.Length).Trim())).Split(':');
                 var username = credentials[0];
                 var password = credentials[1];
-
-                // Obtener las credenciales desde las variables de entorno
+                
                 var validUsername = Environment.GetEnvironmentVariable("AUTH_USER");
                 var validPassword = Environment.GetEnvironmentVariable("AUTH_PASSWORD");
-                // Aquí puedes validar el usuario y contraseña
+               
                 if (username == validUsername && password == validPassword)
                 {
                     await _next(context);

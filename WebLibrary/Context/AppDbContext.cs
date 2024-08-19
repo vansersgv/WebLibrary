@@ -10,8 +10,7 @@ namespace WebLibrary.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //base.OnModelCreating(modelBuilder);
-
+            
             modelBuilder.Entity<Autor>(tb => {
                 tb.HasKey(col => col.IdAutor);
                 tb.Property(col => col.IdAutor).UseIdentityColumn().ValueGeneratedOnAdd();
