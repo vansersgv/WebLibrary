@@ -1,0 +1,124 @@
+﻿
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Biblioteca</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .jumbotron {
+            background-color: #e9ecef;
+        }
+
+        .list-group-item {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="jumbotron text-center">
+            <h1 class="display-4">Gestión de Biblioteca</h1>
+            <p class="lead">Bienvenido al sistema de gestión de una biblioteca. Aquí puedes visualizar y gestionar libros y autores.</p>
+            <hr class="my-4">
+            <p>Utiliza los siguientes enlaces para interactuar con la API:</p>
+            <a class="btn btn-primary btn-lg" href="swagger/index.html" role="button" target="_blank">Abrir Swagger</a>
+        </div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Gestión de Autores</h2>
+                <ul class="list-group" id="autor-lista">
+                    <li class="list-group-item" onclick="verAutores()">Ver todos los autores</li>
+                    <li class="list-group-item" onclick="buscarAutor()">Buscar un autor por nombre</li>
+                    <li class="list-group-item" onclick="consultarLibrosPorAutor()">Consultar libros de un autor</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h2>Gestión de Libros</h2>
+                <ul class="list-group" id="libro-lista">
+                    <li class="list-group-item" onclick="verLibros()">Ver todos los libros</li>
+                    <li class="list-group-item" onclick="buscarLibro()">Buscar un libro por nombre</li>
+                    <li class="list-group-item" onclick="vista()">Solo de vista</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Muestro los resultados -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <h2>Resultados</h2>
+                <pre id="resultado" class="bg-light p-3 border"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+        function verAutores() {
+            fetch('/api/autor/lista')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function buscarAutor() {
+            const nombre = prompt('Ingrese el nombre del autor:');
+            if (nombre) {
+                fetch(`/api/autor/buscar/${encodeURIComponent(nombre)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function verLibros() {
+            fetch('/api/libro/lista')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        function buscarLibro() {
+            const nombre = prompt('Ingrese el nombre del libro:');
+            if (nombre) {
+                fetch(`/api/libro/buscar/${encodeURIComponent(nombre)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+
+        function consultarLibrosPorAutor() {
+            const nombre = prompt('Ingrese el nombre del autor para ver sus libros:');
+            if (nombre) {
+                fetch(`/api/autor/libros/${encodeURIComponent(nombre)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('resultado').textContent = JSON.stringify(data, null, 2);
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
+</body>
+</html>
