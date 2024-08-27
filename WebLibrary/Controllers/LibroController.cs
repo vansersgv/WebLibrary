@@ -54,14 +54,16 @@ namespace WebLibrary.Controllers
         }
 
         [HttpPut]
-        [Route("editar")]
+        [Route("editar/{id}")]
         [SwaggerOperation(Summary = "Edita un libro existente")]
-        public async Task<ActionResult> Editar([FromBody] LibroDTO libroDTO)
+        public async Task<ActionResult> Editar(int id, [FromBody] LibroDTO libroDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            libroDTO.IdLibro = id;
 
             var result = await _libroService.EditarLibroAsync(libroDTO);
             if (!result)

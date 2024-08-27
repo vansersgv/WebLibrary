@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using WebLibrary.Context;
 using WebLibrary.Services;
@@ -8,7 +7,6 @@ using DotNetEnv;
 var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
-
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -23,11 +21,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<AutorService>();
 builder.Services.AddScoped<LibroService>();
 
+// Configurar CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000") // Cambia esto a la URL de tu frontend
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
-
 app.UseMiddleware<BasicAuthMiddleware>();
-
 
 if (app.Environment.IsDevelopment())
 {
@@ -35,16 +43,21 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebLibrary API v1");
-        c.RoutePrefix = "swagger"; 
+        c.RoutePrefix = "swagger";
     });
 }
 
-app.UseStaticFiles(); 
+app.UseStaticFiles();
 
 app.UseRouting();
 app.UseAuthorization();
-app.MapGet("/", () => Results.Redirect("/index.html")); 
+
+// Aplicar la política de CORS
+app.UseCors("AllowFrontend");
+
+// Redirigir a la aplicación Next.js en localhost:3000
+app.MapGet("/", () => Results.Redirect("http://localhost:3000"));
+
 app.MapControllers();
 
 app.Run();
-
