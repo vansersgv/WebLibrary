@@ -26,7 +26,10 @@ namespace WebLibrary.Services
                     Titulo = item.Titulo,
                     Descripcion = item.Descripcion,
                     FechaDePublicacion = item.FechaDePublicacion,
-                    AutorId = item.AutorId
+                    AutorId = item.AutorId,
+                    AutorNombre = item.Autor.Nombre, 
+                    AutorNacionalidad = item.Autor.Nacionalidad,
+                    AutorFechaNacimiento = item.Autor.FechaNacimiento,
                 });
             }
             return listaDTO;
@@ -48,18 +51,35 @@ namespace WebLibrary.Services
                 Titulo = libroDB.Titulo,
                 Descripcion = libroDB.Descripcion,
                 FechaDePublicacion = libroDB.FechaDePublicacion,
-                AutorId = libroDB.AutorId
+                AutorId = libroDB.AutorId,
+                AutorNombre = libroDB.Autor.Nombre,                
             };
         }
 
         public async Task CrearLibroAsync(LibroDTO libroDTO)
         {
+            // Buscar el autor por nombre
+            var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Nombre == libroDTO.AutorNombre);
+
+            if (autor == null)
+            {
+                // Crear un nuevo autor si no existe
+                autor = new Autor
+                {
+                    Nombre = libroDTO.AutorNombre,
+                    Nacionalidad = libroDTO.AutorNacionalidad ?? "Desconocido", // Asignar "Desconocido" si está vacío
+                    FechaNacimiento = libroDTO.AutorFechaNacimiento // Manejar si es nulo en la clase Autor
+                };
+                _context.Autores.Add(autor);
+                await _context.SaveChangesAsync();
+            }
+
             var libroDB = new Libro
             {
                 Titulo = libroDTO.Titulo,
                 Descripcion = libroDTO.Descripcion,
                 FechaDePublicacion = libroDTO.FechaDePublicacion,
-                AutorId = libroDTO.AutorId
+                AutorId = autor.IdAutor // Usar el Id del autor existente o recién creado
             };
             _context.Libros.Add(libroDB);
             await _context.SaveChangesAsync();
@@ -75,10 +95,26 @@ namespace WebLibrary.Services
                 return false;
             }
 
+            // Buscar el autor por nombre
+            var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Nombre == libroDTO.AutorNombre);
+
+            if (autor == null)
+            {
+                // Crear un nuevo autor si no existe
+                autor = new Autor
+                {
+                    Nombre = libroDTO.AutorNombre,
+                    Nacionalidad = libroDTO.AutorNacionalidad ?? "Desconocido", // Asignar "Desconocido" si está vacío
+                    FechaNacimiento = libroDTO.AutorFechaNacimiento // Manejar si es nulo en la clase Autor
+                };
+                _context.Autores.Add(autor);
+                await _context.SaveChangesAsync();
+            }
+
             libroDB.Titulo = libroDTO.Titulo;
             libroDB.Descripcion = libroDTO.Descripcion;
             libroDB.FechaDePublicacion = libroDTO.FechaDePublicacion;
-            libroDB.AutorId = libroDTO.AutorId;
+            libroDB.AutorId = autor.IdAutor;
 
             _context.Libros.Update(libroDB);
             await _context.SaveChangesAsync();

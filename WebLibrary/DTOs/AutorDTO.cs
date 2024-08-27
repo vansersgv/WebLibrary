@@ -9,7 +9,7 @@ namespace WebLibrary.DTOs
 
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [StringLength(100, ErrorMessage = "El nombre no puede tener más de 100 caracteres")]
-        public string? Nombre { get; set; }
+        public required string Nombre { get; set; }
 
         [Required(ErrorMessage = "La fecha de nacimiento es obligatoria")]
         public DateTime FechaNacimiento { get; set; }

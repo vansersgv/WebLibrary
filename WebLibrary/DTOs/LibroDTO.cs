@@ -19,5 +19,10 @@ namespace WebLibrary.DTOs
 
         [Required(ErrorMessage = "El ID del autor es obligatorio")]
         public int AutorId { get; set; }
+
+        public string? AutorNombre { get; set; } // Agregar esta propiedad
+        public string? AutorNacionalidad { get; set; } // Agregar esta propiedad
+        [Required(ErrorMessage = "La fecha de nacimiento del autor es obligatoria")]
+        public DateTime AutorFechaNacimiento { get; set; }
     }
 }
